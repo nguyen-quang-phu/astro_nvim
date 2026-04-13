@@ -21,6 +21,8 @@ return {
   { import = "astrocommunity.recipes.ai" },
   { import = "astrocommunity.ai.sidekick-nvim" },
   { import = "astrocommunity.editing-support.auto-save-nvim" },
+  { import = "astrocommunity.editing-support.mini-operators" },
+  { import = "astrocommunity.motion.mini-ai" },
   { import = "astrocommunity.git.git-blame-nvim" },
   -- import/override with your plugins folder
 }

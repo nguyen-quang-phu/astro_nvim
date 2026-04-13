@@ -18,62 +18,62 @@ return {
 
   -- customize dashboard options
   {
-  "folke/snacks.nvim",
-  priority = 1000,
-  lazy = false,
-  config = function(_, opts)
-    require("snacks").setup(opts)
-  end,
-  ---@type snacks.Config
-  opts = {
-    bigfile = { enabled = true },
-    dashboard = { enabled = true },
-    terminal = {
-      enabled = true,
-      win = {
-        keys = {
-          -- nav_h = { "<C-h>", term_nav("h"), desc = "Go to Left Window", expr = true, mode = "t" },
-          -- nav_j = { "<C-j>", term_nav("j"), desc = "Go to Lower Window", expr = true, mode = "t" },
-          -- nav_k = { "<C-k>", term_nav("k"), desc = "Go to Upper Window", expr = true, mode = "t" },
-          -- nav_l = { "<C-l>", term_nav("l"), desc = "Go to Right Window", expr = true, mode = "t" },
-          -- hide_slash = { "<C-/>", "hide", desc = "Hide Terminal", mode = "t" },
-          -- hide_underscore = { "<c-_>", "hide", desc = "which_key_ignore", mode = "t" },
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    config = function(_, opts)
+      require("snacks").setup(opts)
+    end,
+    ---@type snacks.Config
+    opts = {
+      bigfile = { enabled = true },
+      dashboard = { enabled = true },
+      terminal = {
+        enabled = true,
+        win = {
+          keys = {
+            -- nav_h = { "<C-h>", term_nav("h"), desc = "Go to Left Window", expr = true, mode = "t" },
+            -- nav_j = { "<C-j>", term_nav("j"), desc = "Go to Lower Window", expr = true, mode = "t" },
+            -- nav_k = { "<C-k>", term_nav("k"), desc = "Go to Upper Window", expr = true, mode = "t" },
+            -- nav_l = { "<C-l>", term_nav("l"), desc = "Go to Right Window", expr = true, mode = "t" },
+            -- hide_slash = { "<C-/>", "hide", desc = "Hide Terminal", mode = "t" },
+            -- hide_underscore = { "<c-_>", "hide", desc = "which_key_ignore", mode = "t" },
+          },
         },
       },
-    },
-    explorer = { enabled = true },
-    indent = { enabled = true },
-    input = { enabled = true },
-    notifier = {
-      enabled = true,
-      timeout = 3000,
-    },
-    picker = { enabled = true },
-    quickfile = { enabled = true },
-    scope = { enabled = true },
-    scroll = { enabled = true },
-    statuscolumn = { enabled = true },
-    words = { enabled = true },
-    styles = {
-      notification = {
-        -- wo = { wrap = true } -- Wrap notifications
+      explorer = { enabled = true },
+      indent = { enabled = true },
+      input = { enabled = true },
+      notifier = {
+        enabled = true,
+        timeout = 3000,
+      },
+      picker = { enabled = true },
+      quickfile = { enabled = true },
+      scope = { enabled = true },
+      scroll = { enabled = true },
+      statuscolumn = { enabled = true },
+      words = { enabled = true },
+      styles = {
+        notification = {
+          -- wo = { wrap = true } -- Wrap notifications
+        }
       }
-    }
-  },
-  keys = {
-    { "<c-/>",      function() require("snacks").terminal() end, desc = "Toggle Terminal"},
-  },
-  init = function()
-    vim.api.nvim_create_autocmd("User", {
-      pattern = "VeryLazy",
-      callback = function()
-        -- Setup some globals for debugging (lazy-loaded)
-        _G.dd = function(...)
-          require("snacks").debug.inspect(...)
-        end
-        _G.bt = function()
-          require("snacks").debug.backtrace()
-        end
+    },
+    keys = {
+      { "<c-/>",      function() require("snacks").terminal() end, desc = "Toggle Terminal"},
+    },
+    init = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "VeryLazy",
+        callback = function()
+          -- Setup some globals for debugging (lazy-loaded)
+          _G.dd = function(...)
+            require("snacks").debug.inspect(...)
+          end
+          _G.bt = function()
+            require("snacks").debug.backtrace()
+          end
 
           -- Override print to use snacks for `:=` command
           if vim.fn.has("nvim-0.11") == 1 then
@@ -334,74 +334,137 @@ return {
     },
   },
   {
-  "folke/sidekick.nvim",
-  opts = {
-    cli = {
-      prompts = {
-        generate_commit = "Generate commit with staged changes",
-        create_branch_and_generate_commit = "Create branch and generate commit with staged changes",
-        review_commit= "Can you review latest commit for any issues or improvements?"
-        -- security = "Review {file} for security vulnerabilities",
-        -- custom = function(ctx)
-        --   return "Current file: " .. ctx.buf .. " at line " .. ctx.row
-        -- end,
+    "folke/sidekick.nvim",
+    specs = {
+      {
+        "AstroNvim/astrocore",
+        ---@param opts AstroCoreOpts
+        opts = function(_, opts)
+          local maps = assert(opts.mappings)
+          local prefix = "<Leader>a"
+
+          -- Normal mode mappings
+          maps.n[prefix] = { desc = require("astroui").get_icon("Sidekick", 1, true) .. "Sidekick" }
+          maps.n[prefix .. "a"] = {
+            function() require("sidekick.cli").toggle() end,
+            desc = "Sidekick Toggle CLI",
+          }
+          maps.n[prefix .. "s"] = {
+            function() require("sidekick.cli").select() end,
+            desc = "Select CLI",
+          }
+          maps.n[prefix .. "d"] = {
+            function() require("sidekick.cli").close() end,
+            desc = "Detach a CLI Session",
+          }
+          maps.n[prefix .. "t"] = {
+            function() require("sidekick.cli").send { msg = "{this}" } end,
+            desc = "Send This",
+          }
+          maps.n[prefix .. "f"] = {
+            function() require("sidekick.cli").send { msg = "{file}" } end,
+            desc = "Send File",
+          }
+          maps.n[prefix .. "p"] = {
+            function() require("sidekick.cli").prompt() end,
+            desc = "Select Prompt",
+          }
+
+          maps.n[prefix .. "n"] = { desc = require("astroui").get_icon("SidekickBrain", 1, true) .. "NES" }
+          maps.n[prefix .. "nt"] = {
+            function() require("sidekick.nes").toggle() end,
+            desc = "Toggle NES",
+          }
+          maps.n[prefix .. "ne"] = {
+            function() require("sidekick.nes").enable() end,
+            desc = "Enable NES",
+          }
+          maps.n[prefix .. "nd"] = {
+            function() require("sidekick.nes").disable() end,
+            desc = "Disable NES",
+          }
+          maps.n[prefix .. "nu"] = {
+            function() require("sidekick.nes").update() end,
+            desc = "Update Suggestions",
+          }
+
+          maps.n["<Tab>"] = {
+            function()
+              if not require("sidekick").nes_jump_or_apply() then return "<Tab>" end
+            end,
+            expr = true,
+            desc = "Goto/Apply Next Edit Suggestion",
+          }
+          maps.n["<C-.>"] = {
+            function() require("sidekick.cli").toggle {} end,
+            desc = "Sidekick Toggle",
+          }
+
+          -- Visual mode mappings
+          maps.x[prefix] = { desc = require("astroui").get_icon("Sidekick", 1, true) .. "Sidekick" }
+          maps.x[prefix .. "t"] = {
+            function() require("sidekick.cli").send { msg = "{this}" } end,
+            desc = "Send This",
+          }
+          maps.x[prefix .. "v"] = {
+            function() require("sidekick.cli").send { msg = "{selection}" } end,
+            desc = "Send Visual Selection",
+          }
+          maps.x[prefix .. "p"] = {
+            function() require("sidekick.cli").prompt {} end,
+            desc = "Select Prompt",
+          }
+          maps.x["<C-.>"] = {
+            function() require("sidekick.cli").toggle {} end,
+            desc = "Sidekick Toggle",
+          }
+
+          -- Insert mode mappings
+          maps.i["<C-.>"] = {
+            function() require("sidekick.cli").toggle {} end,
+            desc = "Sidekick Toggle",
+          }
+
+          -- Terminal mode mappings
+          maps.t["<C-.>"] = {
+            function() require("sidekick.cli").toggle {} end,
+            desc = "Sidekick Toggle",
+          }
+        end,
       },
-      mux = {
-        enabled = true,
-        backend = "tmux", -- or "zellij"
+      { "AstroNvim/astroui", opts = { icons = { Sidekick = "", SidekickBrain = "󰧑" } } },
+    },
+    opts = {
+      nes = {
+        enabled = true, -- If the user doesn't have the copilot LSP running internally this gets set as false
+      },
+      cli = {
+        prompts = {
+          generate_commit = "Generate commit with staged changes",
+          create_branch_and_generate_commit = "Create branch and generate commit with staged changes",
+          review_commit= "Can you review latest commit for any issues or improvements?"
+          -- security = "Review {file} for security vulnerabilities",
+          -- custom = function(ctx)
+          --   return "Current file: " .. ctx.buf .. " at line " .. ctx.row
+          -- end,
+        },
+
+        mux = {
+          enabled = true,
+        },
       },
     },
   },
-  -- stylua: ignore
-  keys = {
-    -- nes is also useful in normal mode
-    { "<leader>a", "", desc = "+ai", mode = { "n", "v" } },
-    {
-      "<c-.>",
-      function() require("sidekick.cli").focus() end,
-      desc = "Sidekick Focus",
-      mode = { "n", "t", "i", "x" },
-    },
-    {
-      "<leader>aa",
-      function() require("sidekick.cli").toggle() end,
-      desc = "Sidekick Toggle CLI",
-    },
-    {
-      "<leader>as",
-      function() require("sidekick.cli").select() end,
-      -- Or to select only installed tools:
-      -- require("sidekick.cli").select({ filter = { installed = true } })
-      desc = "Select CLI",
-    },
-    {
-      "<leader>ad",
-      function() require("sidekick.cli").close() end,
-      desc = "Detach a CLI Session",
-    },
-    {
-      "<leader>at",
-      function() require("sidekick.cli").send({ msg = "{this}" }) end,
-      mode = { "x", "n" },
-      desc = "Send This",
-    },
-    {
-      "<leader>af",
-      function() require("sidekick.cli").send({ msg = "{file}" }) end,
-      desc = "Send File",
-    },
-    {
-      "<leader>av",
-      function() require("sidekick.cli").send({ msg = "{selection}" }) end,
-      mode = { "x" },
-      desc = "Send Visual Selection",
-    },
-    {
-      "<leader>ap",
-      function() require("sidekick.cli").prompt() end,
-      mode = { "n", "x" },
-      desc = "Sidekick Select Prompt",
-    },
-  },
-}
+  {
+    'nvim-mini/mini.ai',
+    opts = {
+      custom_textobjects = {
+        g = function()
+          local start_line, end_line = 1, vim.fn.line("$")
+          local to_col = math.max(vim.fn.getline(end_line):len(), 1)
+          return { from = { line = start_line, col = 1 }, to = { line = end_line, col = to_col } }
+        end
+      }
+    }
+  }
 }
